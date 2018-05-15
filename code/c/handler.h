@@ -11,7 +11,6 @@
 #define IEEE80211_FCTL_RETRY        0x0800
 
 
-void pkt_handler(u_char * useless, const struct pcap_pkthdr* pkthdr, 
+void pkt_handler(u_char * passed_data, const struct pcap_pkthdr* pkthdr, 
         const u_char * packet);
 int handle_probe_req(const u_char * packet, struct ieee80211_hdr * hdr, pcap_t * handle);
-int handle_authentication_request(struct ieee80211_hdr * req_hdr, pcap_t * handle);

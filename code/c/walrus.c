@@ -46,8 +46,6 @@ uint16_t get_seq_num()
     return g_seq_num;
 }
 
-
-
 static int parse_opt(int key, char * arg, struct argp_state *state) {
     int * arg_count = state->input;
     switch(key) {
@@ -219,19 +217,6 @@ int create_beacon(struct beacon_pkt ** beacon)
     (*beacon)->rates->len=g_rates_len;
     memcpy((*beacon)->rates->buf, g_rates,g_rates_len);
     
-    ///* INTERWORKING */
-    //struct beacon_variable * interworking;
-    //buf=realloc(buf, size+sizeof(struct beacon_variable));
-    //if(!buf) {
-    //    fprintf(stderr, "unable to extend buf\n");
-    //    return -1;
-    //}
-    //interworking=(struct beacon_variable *)(buf+size);
-    //size=size+sizeof(struct beacon_variable);
-    //interworking->id=0x6b;
-    //interworking->len=0x01;
-    //interworking->buf[0]=0x12;
-    
     /* DS PARAMETERS */
     const uint8_t ds_data[]={0x07};
     if(add_beacon_variable(&buf, &size, (*beacon)->ds, 0x03, 0x01, ds_data) != 0) {
@@ -336,12 +321,12 @@ uint64_t get_current_timestamp()
 	return timestamp;
 }
 
-void pkt_handler(u_char * useless, const struct pcap_pkthdr* pkthdr, 
+void pkt_handler(u_char * passed_data, const struct pcap_pkthdr* pkthdr, 
         const u_char * packet) {
 
     const u_char * rt_hdr;
     //pcap_t * handle= (pcap_t *) useless;
-    struct handler_data * h_data = (struct handler_data *)(useless);
+    struct handler_data * h_data = (struct handler_data *)(passed_data);
     pcap_t * handle=h_data->handle;
 
     rt_hdr=packet;
@@ -399,52 +384,6 @@ int create_authentication_request(struct authentication_pkt * g_auth)
     g_auth->auth->seq=0x0002;
     g_auth->auth->status_code=0x0000;
 
-    return 0;
-}
-
-int handle_authentication_request(struct ieee80211_hdr * req_hdr, pcap_t * handle)
-{
-	uint8_t fcchunk[2];
-    uint8_t * buf;
-    uint8_t * rt;
-    struct ieee80211_hdr * hdr;
-    struct authentication_data * auth;
-    size_t size;
-
-	size = sizeof(u8aRadiotapHeader) 
-        + sizeof(struct ieee80211_hdr) 
-        + sizeof(struct authentication_data);
-
-	buf = (uint8_t *) malloc(size);
-	rt = (uint8_t *) buf;
-	hdr = (struct ieee80211_hdr *) (buf + sizeof(u8aRadiotapHeader));
-    auth = (struct authentication_data *) (hdr + 1);
-
-    /* RADIOTAPHEADER */
-	memcpy(rt, u8aRadiotapHeader, sizeof(u8aRadiotapHeader));
-	fcchunk[0]=IEEE80211_STYPE_AUTH;
-	fcchunk[1]=0x00;
-	memcpy(&hdr->frame_control, &fcchunk[0], 2*sizeof(uint8_t));
-
-    /* IEEE80211 HEADER*/
-	hdr->duration_id=0xffff;
-    hdr->seq_ctrl=(get_seq_num())<<4;
-	memcpy(&hdr->addr1[0], req_hdr->addr2,6*sizeof(uint8_t));
-	memcpy(&hdr->addr2[0],g_mac_addr,6*sizeof(uint8_t));
-	memcpy(&hdr->addr3[0],g_mac_addr,6*sizeof(uint8_t));
-
-    /* AUTHENTICATION VALUES */
-    auth->algorithm=0x0000;
-    auth->seq=0x0002;
-    auth->status_code=0x0000;
-    
-    if(pcap_sendpacket(handle, buf, size) !=0)
-    {
-       get_pcap_error(handle);
-       return -1;
-    }
-
-    free(buf);
     return 0;
 }
 
@@ -521,25 +460,11 @@ int create_probe_response(struct probe_resp_pkt ** probe_resp, const u_char *pac
     (*probe_resp)->rates->len=g_rates_len;
     memcpy((*probe_resp)->rates->buf, g_rates,g_rates_len);
     
-    ///* INTERWORKING */
-    //struct beacon_variable * interworking;
-    //buf=realloc(buf, size+sizeof(struct beacon_variable));
-    //if(!buf) {
-    //    fprintf(stderr, "unable to extend buf\n");
-    //    return -1;
-    //}
-    //interworking=(struct beacon_variable *)(buf+size);
-    //size=size+sizeof(struct beacon_variable);
-    //interworking->id=0x6b;
-    //interworking->len=0x01;
-    //interworking->buf[0]=0x12;
-    
     /* DS PARAMETERS */
     const uint8_t ds_data[]={0x07};
     if(add_beacon_variable(&buf, &size, (*probe_resp)->ds, 0x03, 0x01, ds_data) != 0) {
         return -1;
     }
-
 
     ///* ERP */
     const uint8_t erp_data[]={0x00};
