@@ -1,3 +1,8 @@
+struct handler_data {
+    pcap_t * handle;
+    struct probe_resp_pkt * probe_resp;
+    struct authentication_pkt * auth;
+};
 struct beacon_pkt {
     uint8_t * buf;
     uint8_t * rt;
@@ -10,7 +15,23 @@ struct beacon_pkt {
     struct beacon_variable * tim;
     struct beacon_variable * erp;
     struct beacon_variable * rsn_hdr;
+    struct beacon_variable * ext_capes;
 };
+
+
+struct authentication_pkt {
+    uint8_t * buf;
+    uint8_t * rt;
+    size_t size;
+    struct ieee80211_hdr *hdr;
+    struct authentication_data * auth;
+};
+
+struct authentication_data {
+    uint16_t algorithm;
+    uint16_t seq;
+    uint16_t status_code;
+} __attribute__ ((packed));
 
 struct probe_resp_pkt {
     uint8_t * buf;
@@ -23,6 +44,7 @@ struct probe_resp_pkt {
     struct beacon_variable * ds;
     struct beacon_variable * erp;
     struct beacon_variable * rsn_hdr;
+    struct beacon_variable * ext_capes;
 };
 
 struct ieee80211_hdr {
