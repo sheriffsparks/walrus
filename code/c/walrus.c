@@ -31,10 +31,14 @@ int send_beacon(pcap_t * handle);
 void * beacon_thread(void * handle);
 void extend_buffer(uint8_t * buf, int size);
 void pkt_handler(u_char * useless, const struct pcap_pkthdr* pkthdr, 
-        const u_char * packet);
-int create_probe_response(struct probe_resp_pkt ** probe_resp, const u_char * packet, struct ieee80211_hdr *req_hdr);
+                 const u_char * packet);
+int create_probe_response (struct probe_resp_pkt ** probe_resp, 
+                           const u_char * packet, 
+                           struct ieee80211_hdr *req_hdr);
 uint64_t get_current_timestamp();
-int add_beacon_variable(uint8_t ** buf,size_t * size, struct beacon_variable * b_var, const uint8_t id, const uint8_t len,const uint8_t data[]);
+int add_beacon_variable(uint8_t ** buf,size_t * size, 
+                        struct beacon_variable * b_var, const uint8_t id, 
+                        const uint8_t len,const uint8_t data[]);
 int create_beacon(struct beacon_pkt ** beacon);
 int create_authentication_request(struct authentication_pkt * g_auth);
 
@@ -90,9 +94,10 @@ static int parse_opt(int key, char * arg, struct argp_state *state) {
 
 int main(int argc, char **argv) {
     /* ARGUMENT HANDELING */
-    struct argp_option options[]= {
-        { "mac-addres", 'm', "MACADDRESS", 0, "Spoof the mac address of AP. format-> aa:bb:cc:11:22:33"},
-        { 0 }
+    struct argp_option options[] = {
+        { "mac-addres", 'm', "MACADDRESS", 0, 
+          "Spoof the mac address of AP. format-> aa:bb:cc:11:22:33"},
+          { 0 }
     };
     int arg_count =1;
     struct argp argp={ options, parse_opt, "INTERFACE" };
@@ -106,7 +111,8 @@ int main(int argc, char **argv) {
         get_mac_address(g_mac_addr,g_interface);
 
         mac_addr_to_str(g_mac_addr,g_mac_addr_str);
-        printf("%s MAC address assigned from interface default: %s\n", status, g_mac_addr_str);
+        printf("%s MAC address assigned from interface default: %s\n", 
+               status, g_mac_addr_str);
     }
     
     pcap_t* handle=pcap_open_live(g_interface,96,0,0,pcap_errbuf);
@@ -130,7 +136,8 @@ int main(int argc, char **argv) {
     }
 
 
-    struct authentication_pkt * g_auth=malloc(sizeof(struct authentication_pkt));
+    struct authentication_pkt * g_auth = malloc(
+                                        sizeof(struct authentication_pkt));
 
     struct handler_data * h_data=malloc(sizeof(struct handler_data));
     h_data->handle=handle;
@@ -152,7 +159,6 @@ int main(int argc, char **argv) {
 
 void * beacon_thread(void * args) {
     pcap_t * handle= (pcap_t *) args;
-    printf("handle: %p\n", handle);
     struct beacon_pkt * beacon=malloc((sizeof(struct beacon_pkt)));
     beacon->size=0;
     if(create_beacon(&beacon)!=0) {
@@ -184,10 +190,11 @@ int create_beacon(struct beacon_pkt ** beacon)
 	buf = (uint8_t *) malloc(size);
     (*beacon)->buf=buf;
 	(*beacon)->rt = (uint8_t *) buf;
-	(*beacon)->hdr = (struct ieee80211_hdr *) (buf + sizeof(u8aRadiotapHeader));
-    (*beacon)->b_hdr = (struct beacon_hdr *) ((*beacon)->hdr+1);
-    (*beacon)->ssid = (struct beacon_variable *) ((*beacon)->b_hdr+1);
-    (*beacon)->rates= (struct beacon_variable *) ((*beacon)->ssid->buf+strlen(g_ssid));
+	(*beacon)->hdr = (struct ieee80211_hdr*) (buf + sizeof(u8aRadiotapHeader));
+    (*beacon)->b_hdr = (struct beacon_hdr*) ((*beacon)->hdr+1);
+    (*beacon)->ssid = (struct beacon_variable*) ((*beacon)->b_hdr+1);
+    (*beacon)->rates= (struct beacon_variable*) 
+                      ((*beacon)->ssid->buf+strlen(g_ssid));
     
 
     /* RADIOTAPHEADER */
@@ -219,19 +226,22 @@ int create_beacon(struct beacon_pkt ** beacon)
     
     /* DS PARAMETERS */
     const uint8_t ds_data[]={0x07};
-    if(add_beacon_variable(&buf, &size, (*beacon)->ds, 0x03, 0x01, ds_data) != 0) {
+    if (add_beacon_variable (&buf, &size, (*beacon)->ds, 
+                             0x03, 0x01, ds_data) != 0) {
         return -1;
     }
 
     /* TIM */
     const uint8_t tim_data[]= { 0x00, 0x01,0x00, 0x00 };
-    if(add_beacon_variable(&buf, &size, (*beacon)->tim, 0x05, 0x04, tim_data) != 0) {
+    if (add_beacon_variable (&buf, &size, (*beacon)->tim,
+                             0x05, 0x04, tim_data) != 0) {
         return -1;
     }
 
     ///* ERP */
     const uint8_t erp_data[]={0x00};
-    if(add_beacon_variable(&buf, &size, (*beacon)->ext_capes, 0x2a, 0x01, erp_data) != 0) {
+    if( add_beacon_variable (&buf, &size, (*beacon)->ext_capes,
+                             0x2a, 0x01, erp_data) != 0) {
         return -1;
     }
 
