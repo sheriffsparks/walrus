@@ -20,16 +20,21 @@ int get_mac_address(uint8_t *  mac_address, char  * interface)
   return 1;
 }
 void mac_addr_to_str(uint8_t * mac,char * mac_str) {
-    sprintf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
+    sprintf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x", 
+            mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
 }
 void str_to_mac_addr(char * str, uint8_t * mac) {
-    int values[6];
-    sscanf(str, "%x:%x:%x:%x:%x:%x%*c", &values[0], &values[1], &values[2], &values[3], &values[4], &values[5] );
-    for(int i=0; i<6; ++i) {
+    unsigned int values[6];
+
+    sscanf(str, "%x:%x:%x:%x:%x:%x", 
+           &values[0], &values[1], &values[2], 
+           &values[3], &values[4], &values[5] );
+
+    for (int i=0; i<6; ++i) {
         mac[i]=(uint8_t) values[i];
     }
-    printf("%02x:%02x:%02x:%02x:%02x:%02x\n", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
 }
+
 int is_valid_mac_address(char * mac) {
     int i = 0;
     int s = 0;

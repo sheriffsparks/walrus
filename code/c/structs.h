@@ -10,12 +10,12 @@ struct beacon_pkt {
     struct ieee80211_hdr *hdr;
     struct beacon_hdr *b_hdr;
     struct beacon_variable *rates;
-    struct beacon_variable * ssid;
-    struct beacon_variable * ds;
-    struct beacon_variable * tim;
-    struct beacon_variable * erp;
-    struct beacon_variable * rsn_hdr;
-    struct beacon_variable * ext_capes;
+    struct beacon_variable *ssid;
+    struct beacon_variable *ds;
+    struct beacon_variable *tim;
+    struct beacon_variable *erp;
+    struct beacon_variable *rsn_hdr;
+    struct beacon_variable *ext_capes;
 };
 
 

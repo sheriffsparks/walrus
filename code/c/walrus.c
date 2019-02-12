@@ -217,7 +217,7 @@ int create_beacon(struct beacon_pkt ** beacon)
     /* SSID */
     (*beacon)->ssid->id=0x00;
     (*beacon)->ssid->len=strlen(g_ssid);
-    memcpy((*beacon)->ssid->buf, g_ssid,strlen(g_ssid));
+    memcpy((*beacon)->ssid->buf, g_ssid, strlen(g_ssid));
 
     /* SUPPORTED RATES */
     (*beacon)->rates->id=0x01;
@@ -291,7 +291,7 @@ int create_beacon(struct beacon_pkt ** beacon)
     return 0;
 }
 
-int add_beacon_variable(uint8_t ** buf,size_t * size, struct beacon_variable * b_var, const uint8_t id, const uint8_t len,const uint8_t data[]) {
+int add_beacon_variable(uint8_t ** buf,size_t * size, struct beacon_variable * b_var, const uint8_t id, const uint8_t len, const uint8_t data[]) {
     size_t oldsize;
     oldsize=*size;
     *size=*size+sizeof(struct beacon_variable)+(sizeof(uint8_t))*(len-1);
@@ -356,7 +356,7 @@ void pkt_handler(u_char * passed_data, const struct pcap_pkthdr* pkthdr,
         {
            get_pcap_error(handle);
         }
-            printf("%s Sent Authentication Response to %s\n", notification, src_mac);
+        printf("%s Sent Authentication Response to %s\n", notification, src_mac);
     }
     if(hdr->frame_control==IEEE80211_STYPE_PROBE_REQ) {
         handle_probe_req(packet,hdr, handle);
